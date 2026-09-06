@@ -1,0 +1,99 @@
+import os
+
+# ---------------------------------------------------------------------------
+# PATHS
+# ---------------------------------------------------------------------------
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+
+BACKGROUNDS_DIR = os.path.join(ASSETS_DIR, "backgrounds")
+CHARACTERS_DIR = os.path.join(ASSETS_DIR, "characters")
+OBJECTS_DIR = os.path.join(ASSETS_DIR, "objects")
+SOUNDS_DIR = os.path.join(ASSETS_DIR, "sounds")
+MUSIC_DIR = os.path.join(ASSETS_DIR, "music")
+
+PLAYER_IMAGE_PATH = os.path.join(CHARACTERS_DIR, "player.png")
+NPC_IMAGE_PATH = os.path.join(CHARACTERS_DIR, "npc.png")
+EGG_IMAGE_PATH = os.path.join(OBJECTS_DIR, "egg.png")
+
+# ---------------------------------------------------------------------------
+# WINDOW / TIME
+# ---------------------------------------------------------------------------
+SCREEN_WIDTH = 1280
+SCREEN_HEIGHT = 720
+FPS = 60
+GAME_TITLE = "DON'T DROP THE EGG"
+
+# ---------------------------------------------------------------------------
+# COLORS
+# ---------------------------------------------------------------------------
+WHITE = (245, 245, 240)
+CREAM = (250, 240, 210)
+BLACK = (20, 20, 20)
+DARK_GRAY = (40, 40, 45)
+GRAY = (120, 120, 125)
+LIGHT_GRAY = (190, 190, 195)
+RED = (200, 60, 60)
+DARK_RED = (150, 30, 30)
+GREEN = (80, 170, 90)
+DARK_GREEN = (40, 110, 55)
+YELLOW = (235, 200, 70)
+ORANGE = (230, 140, 60)
+BROWN = (160, 85, 55)
+DARK_BROWN = (80, 55, 35)
+BLUE = (70, 120, 200)
+SKY_BLUE = (140, 190, 230)
+SKIN = (235, 195, 160)
+
+CONDITION_GOOD_COLOR = (95, 190, 105)
+CONDITION_OK_COLOR = (225, 200, 70)
+CONDITION_BAD_COLOR = (230, 140, 60)
+CONDITION_CRITICAL_COLOR = (205, 60, 55)
+
+# ---------------------------------------------------------------------------
+# PLAYER
+# ---------------------------------------------------------------------------
+PLAYER_SIZE = (48, 64)
+PLAYER_SPEED = 230.0          # pixels / second
+PLAYER_COLLIDER_INSET = (12, 8)  # shrink the collision rect vs sprite size
+
+# ---------------------------------------------------------------------------
+# EGG
+# ---------------------------------------------------------------------------
+EGG_SIZE = (34, 42)
+EGG_START_CONDITION = 100
+EGG_PICKUP_RADIUS = 55
+EGG_CARRY_OFFSET = (0, -18)   # relative to player center, "held in front" position
+DELIVERY_RADIUS = 78
+
+# Damage tiers (see usage in game/egg.py and level obstacles)
+DAMAGE_SMALL_BUMP = 5
+DAMAGE_MEDIUM_LOW = 10
+DAMAGE_DISTRACTOR_BUMP = 4
+DAMAGE_MEDIUM_HIGH = 15
+DAMAGE_LARGE_LOW = 25
+DAMAGE_LARGE_HIGH = 40
+DAMAGE_MAJOR_FALL = 55
+DAMAGE_KNOCKBACK_DROP = 18
+EGG_CHICK_HEAL = 8
+CHICK_HEAL_COOLDOWN = 1.0
+
+BUMP_COOLDOWN = 0.8  # seconds between repeated solid-obstacle bump damage
+
+# Condition tier thresholds (inclusive upper bound of each band)
+TIER_NORMAL = 100
+TIER_SMALL_CRACK = 75
+TIER_CRACKED = 50
+TIER_CRITICAL = 25
+TIER_BROKEN = 0
+
+# ---------------------------------------------------------------------------
+# CONTROLS (reference only - actual keys read in game/game.py)
+# ---------------------------------------------------------------------------
+CONTROLS_TEXT = "WASD/Arrows: Move   E: Pick Up / Gently place   SPACE: Drop   ESC: Pause"
+
+# ---------------------------------------------------------------------------
+# MISC
+# ---------------------------------------------------------------------------
+FONT_NAME = None  # default pygame font
+LEVEL_COMPLETE_DELAY = 2.2   # seconds shown before advancing automatically
