@@ -1,17 +1,3 @@
-"""
-game/assets.py
-------------------
-Central place for loading art assets. Every loader here follows the
-same rule: try to load the real file, and if it's missing (or fails
-to load for any reason) fall back to a small procedurally drawn
-replacement so the game never crashes and never shows a plain
-rectangle where a character/egg/background should be.
-
-Nothing in this file ever raises an exception outward - missing
-assets are expected and handled gracefully, exactly as the brief
-requires.
-"""
-
 import os
 import random
 import math
@@ -21,9 +7,6 @@ import pygame
 import settings
 
 
-# ---------------------------------------------------------------------------
-# Generic image loader
-# ---------------------------------------------------------------------------
 def try_load_image(path, size=None, mode="stretch"):
     """Attempt to load an image from disk. Returns a Surface or None."""
     if not path or not os.path.isfile(path):
@@ -39,7 +22,6 @@ def try_load_image(path, size=None, mode="stretch"):
                 image = pygame.transform.smoothscale(image, size)
         return image
     except Exception:
-        # Corrupt file, unsupported format, etc. - treat as missing.
         return None
 
 
@@ -68,9 +50,6 @@ def _cover_image(image, size):
     return scaled.subsurface(crop).copy()
 
 
-# ---------------------------------------------------------------------------
-# PLAYER fallback
-# ---------------------------------------------------------------------------
 def make_fallback_player(size, walk_phase=0.0):
     """A small readable 'person' made of primitives - not a rectangle blob."""
     w, h = size
@@ -81,7 +60,6 @@ def make_fallback_player(size, walk_phase=0.0):
     body_color = settings.BLUE
     skin = settings.SKIN
 
-    # legs (slight scissor motion while walking)
     leg_swing = math.sin(walk_phase * math.pi * 2) * 6
     leg_w = w * 0.18
     leg_top = h * 0.62
@@ -92,25 +70,21 @@ def make_fallback_player(size, walk_phase=0.0):
                       (w * 0.55 + leg_swing * 0.15, leg_top, leg_w, h * 0.34),
                       border_radius=4)
 
-    # body
     body_rect = pygame.Rect(w * 0.20, h * 0.32 + bob, w * 0.60, h * 0.36)
     pygame.draw.rect(surf, body_color, body_rect, border_radius=10)
 
-    # arms
     arm_w = w * 0.14
     pygame.draw.rect(surf, body_color,
                       (w * 0.06, h * 0.38 + bob, arm_w, h * 0.26), border_radius=6)
     pygame.draw.rect(surf, body_color,
                       (w * 0.80, h * 0.38 - bob, arm_w, h * 0.26), border_radius=6)
 
-    # head
     head_r = w * 0.26
     head_center = (w * 0.5, h * 0.24 + bob)
     pygame.draw.circle(surf, skin, head_center, head_r)
     pygame.draw.circle(surf, settings.DARK_BROWN,
                         (head_center[0], head_center[1] - head_r * 0.55),
                         head_r * 0.9, width=0)
-    # simple face
     pygame.draw.circle(surf, settings.BLACK,
                         (head_center[0] - head_r * 0.35, head_center[1]), 2)
     pygame.draw.circle(surf, settings.BLACK,
@@ -143,24 +117,18 @@ def load_player_frame(walk_phase, size=settings.PLAYER_SIZE):
     return _player_fallback_cache[key]
 
 
-# ---------------------------------------------------------------------------
-# EGG fallback + damage overlay (cracks work on real PNGs too!)
-# ---------------------------------------------------------------------------
 def make_fallback_egg_base(size):
     """A believable egg silhouette made from an ellipse, not a rectangle."""
     w, h = size
     surf = pygame.Surface(size, pygame.SRCALPHA)
 
-    # slightly irregular egg silhouette using a polygon approximation
     cx, cy = w / 2, h / 2
     points = []
     steps = 24
     for i in range(steps):
         angle = (i / steps) * math.pi * 2
-        # eggs are narrower at the top, wider at the bottom
         rx = (w / 2) * (0.86 if math.cos(angle) < 0 else 1.0)
         ry = (h / 2)
-        # pinch the top slightly for an egg-like taper
         taper = 1.0 - 0.18 * max(0, math.sin(angle))
         x = cx + math.cos(angle) * rx * taper
         y = cy + math.sin(angle) * ry
@@ -169,13 +137,11 @@ def make_fallback_egg_base(size):
     pygame.draw.polygon(surf, settings.CREAM, points)
     pygame.draw.polygon(surf, (210, 195, 165), points, width=2)
 
-    # soft highlight
     highlight = pygame.Surface(size, pygame.SRCALPHA)
     pygame.draw.ellipse(highlight, (255, 255, 255, 110),
                          (w * 0.20, h * 0.14, w * 0.28, h * 0.30))
     surf.blit(highlight, (0, 0))
 
-    # soft shadow at the base
     shadow = pygame.Surface(size, pygame.SRCALPHA)
     pygame.draw.ellipse(shadow, (0, 0, 0, 40),
                          (w * 0.15, h * 0.78, w * 0.7, h * 0.16))
@@ -220,21 +186,18 @@ def draw_egg_surface(condition, size=settings.EGG_SIZE, wobble_seed=0):
     rng = random.Random(int(wobble_seed))
 
     if condition <= settings.TIER_BROKEN:
-        # Handled by caller (break sequence) - draw a "cracked open" look
         pygame.draw.line(base, (90, 70, 50), (w * 0.15, h * 0.5), (w * 0.85, h * 0.55), 3)
         return base
 
     if condition > settings.TIER_SMALL_CRACK:
-        return base  # 100-76: perfect, no cracks
+        return base
 
     if condition > settings.TIER_CRACKED:
-        # 75-51: one small crack
         cx, cy = w * 0.5, h * 0.4
         _draw_crack_line(base, (cx - 4, cy - 8), (cx + 3, cy + 6), 2)
         _draw_crack_line(base, (cx + 3, cy + 6), (cx - 2, cy + 14), 2)
 
     elif condition > settings.TIER_CRITICAL:
-        # 50-26: more visible cracks
         for i in range(3):
             ox = rng.uniform(-3, 3)
             cx, cy = w * (0.35 + i * 0.18), h * 0.35
@@ -242,7 +205,6 @@ def draw_egg_surface(condition, size=settings.EGG_SIZE, wobble_seed=0):
             _draw_crack_line(base, (cx + 4 + ox, cy + 8), (cx - 3 + ox, cy + 18), 2)
 
     else:
-        # 25-1: heavy cracking
         for i in range(5):
             ox = rng.uniform(-4, 4)
             oy = rng.uniform(-4, 4)
@@ -256,9 +218,6 @@ def draw_egg_surface(condition, size=settings.EGG_SIZE, wobble_seed=0):
     return base
 
 
-# ---------------------------------------------------------------------------
-# BACKGROUNDS
-# ---------------------------------------------------------------------------
 def make_fallback_background(size, scheme):
     """
     Procedural placeholder background so every level looks like a real
@@ -325,8 +284,6 @@ def load_background(name, scheme, size=(settings.SCREEN_WIDTH, settings.SCREEN_H
     if real is None:
         bg = make_fallback_background(size, scheme)
     else:
-        # Keep the frame opaque so transparent background art cannot reveal
-        # sprite pixels from the previous frame.
         bg = make_fallback_background(size, scheme)
         bg.blit(real, (0, 0))
     _background_cache[key] = bg
@@ -350,9 +307,6 @@ def load_destination(name, size):
     return destination
 
 
-# ---------------------------------------------------------------------------
-# SIMPLE OBJECT / ACTOR IMAGES (obstacles, NPCs, cars)
-# ---------------------------------------------------------------------------
 def make_fallback_box(size, color=settings.BROWN):
     w, h = size
     surf = pygame.Surface(size, pygame.SRCALPHA)
@@ -365,8 +319,6 @@ def make_fallback_box(size, color=settings.BROWN):
     pygame.draw.rect(surf, color, body, border_radius=7)
     pygame.draw.rect(surf, (255, 235, 190, 55), body, width=2, border_radius=7)
 
-    # Wide boards and end grain make a solid obstacle read as a crate,
-    # even when no optional image has been supplied.
     board_count = max(2, min(5, int(h / 34)))
     for index in range(1, board_count):
         y = int(h * index / board_count)
@@ -418,8 +370,6 @@ def load_obstacle_image(filename, size, color=settings.BROWN):
     path = os.path.join(settings.OBJECTS_DIR, filename)
     real = try_load_image(path)
     if real is not None:
-        # Use the visible artwork as the source bounds. This prevents a PNG's
-        # transparent outer padding from shrinking the box inside its collider.
         visible_bounds = real.get_bounding_rect()
         if visible_bounds.width > 0 and visible_bounds.height > 0:
             real = real.subsurface(visible_bounds).copy()

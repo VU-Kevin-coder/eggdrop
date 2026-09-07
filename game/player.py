@@ -1,10 +1,3 @@
-"""
-game/player.py
--------------------
-The player character: movement, simple walk animation, and the
-collider used against level obstacles.
-"""
-
 import pygame
 
 import settings
@@ -61,9 +54,8 @@ class Player:
         self.facing = "down"
         self.moving = False
         self.walk_phase = 0.0
-        self.carrying = None  # reference to an Egg, or None
+        self.carrying = None
 
-    # ------------------------------------------------------------------
     @property
     def rect(self):
         w, h = self.size
@@ -79,7 +71,6 @@ class Player:
     def center(self):
         return pygame.Vector2(self.pos.x, self.pos.y)
 
-    # ------------------------------------------------------------------
     def handle_movement(self, keys, dt, solids, bounds, speed_multiplier=1.0):
         dx = dy = 0.0
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -115,7 +106,6 @@ class Player:
         else:
             self.walk_phase = 0.0
 
-    # ------------------------------------------------------------------
     def draw(self, surface):
         frame = assets.load_player_frame(self.walk_phase, self.size)
         w, h = self.size

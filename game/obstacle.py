@@ -1,12 +1,3 @@
-"""
-game/obstacle.py
----------------------
-A single flexible class covers everything from a static bookshelf to
-a car driving back and forth across the road. Keeping one class for
-all of these (instead of a class hierarchy per hazard) keeps the code
-small and easy to read, per the assignment's architecture goals.
-"""
-
 import pygame
 
 from game import assets
@@ -49,8 +40,6 @@ class Obstacle:
             return
         self._t += dt
 
-        # constant-speed linear ping-pong (not sine) so the hazard's
-        # timing is predictable and fair for the player to react to
         span = self.move_range * 2
         period = span / max(1, self.move_speed)
         elapsed = self._t % period

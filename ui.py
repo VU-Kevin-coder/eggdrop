@@ -51,7 +51,7 @@ def draw_how_to_play(surface, fonts):
         "",
         "WASD / Arrow Keys  -  Move",
         "E                  -  Pick up the egg",
-        "SPACE              -  Gently place the egg down",
+        "SPACE              -  Drop the egg (causes damage)",
         "ESC                -  Pause",
         "R                  -  Restart after breaking the egg",
         "",

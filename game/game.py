@@ -1,17 +1,3 @@
-"""
-game/game.py
-------------
-The Game class owns the main loop and the state machine. Every state
-transition described in the design brief happens here, explicitly and
-without placeholders:
-
-MENU -> INTRO -> PLAYING -> (LEVEL_COMPLETE -> PLAYING)* -> VICTORY -> MENU
-                     |                                  
-                     +--> PAUSED --> PLAYING
-                     |
-                     +--> GAME_OVER --> PLAYING (retry) or MENU
-"""
-
 import sys
 import pygame
 
@@ -96,17 +82,16 @@ class Game:
         self._prev_egg_condition = settings.EGG_START_CONDITION
         self._footstep_timer = 0.0
         self._wobble_audio_timer = 0.0
+        self._reckless_run_timer = 0.0
+        self._reckless_voice_used = False
         self.delivery_ready = False
 
         self.audio.play_music("menu")
 
-    # ------------------------------------------------------------------
-    # MAIN LOOP
-    # ------------------------------------------------------------------
     def run(self):
         while self.running:
             dt = self.clock.tick(settings.FPS) / 1000.0
-            dt = min(dt, 0.05)  # avoid huge jumps if the window is dragged/stalled
+            dt = min(dt, 0.05)
             self.handle_events()
             self.update(dt)
             self.draw()
@@ -114,9 +99,6 @@ class Game:
         pygame.quit()
         sys.exit()
 
-    # ------------------------------------------------------------------
-    # NEW GAME / LEVEL FLOW
-    # ------------------------------------------------------------------
     def start_new_game(self):
         self.egg_condition_carry = settings.EGG_START_CONDITION
         self.current_level_index = 0
@@ -144,6 +126,8 @@ class Game:
         self.delivery_ready = False
         self.hud_quip = ""
         self.hud_quip_timer = 0.0
+        self._reckless_run_timer = 0.0
+        self._reckless_voice_used = False
 
         self.state = states.PLAYING
         self.audio.play_music("gameplay")
@@ -167,9 +151,6 @@ class Game:
         self.current_level_index = 0
         self.audio.play_music("menu")
 
-    # ------------------------------------------------------------------
-    # EVENTS
-    # ------------------------------------------------------------------
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -261,6 +242,8 @@ class Game:
                     self.egg.drop_down(place_pos, self.audio)
                     self.player.carrying = None
                     self.delivery_ready = False
+                    self.hud_quip = "You dropped the egg. It took damage."
+                    self.hud_quip_timer = 1.6
 
     def _handle_paused_event(self, event):
         if event.type == pygame.KEYDOWN:
@@ -286,7 +269,6 @@ class Game:
         elif event.type == pygame.MOUSEBUTTONDOWN:
             self.return_to_menu()
 
-    # ------------------------------------------------------------------
     def _position_in_front_of_player(self, distance_px):
         px, py = self.player.pos.x, self.player.pos.y
         offsets = {
@@ -298,9 +280,6 @@ class Game:
         ox, oy = offsets.get(self.player.facing, (0, distance_px))
         return (px + ox, py + oy)
 
-    # ------------------------------------------------------------------
-    # UPDATE
-    # ------------------------------------------------------------------
     def update(self, dt):
         if self.state == states.PLAYING:
             self._update_playing(dt)
@@ -332,6 +311,17 @@ class Game:
         else:
             self._wobble_audio_timer = 0.0
 
+        if self.player.carrying is not None and self.player.moving:
+            self._reckless_run_timer += dt
+        else:
+            self._reckless_run_timer = 0.0
+
+        if not self._reckless_voice_used and self._reckless_run_timer >= 2.5:
+            self._reckless_voice_used = True
+            self.audio.play("reckless_voice", volume=0.8)
+            self.hud_quip = "WHY ARE YOU RUNNING WITH AN EGG?!"
+            self.hud_quip_timer = 2.2
+
         if self.egg.carried:
             self.egg.follow(self.player.center, self.player.facing)
         self.egg.update(dt)
@@ -349,7 +339,10 @@ class Game:
             self.delivery_ready = False
 
         if self.egg.condition < before_condition:
-            self._show_damage_quip(before_condition - self.egg.condition)
+            self._show_damage_quip(
+                before_condition - self.egg.condition,
+                self.level.last_damage_reason,
+            )
 
         if self.egg.broken:
             self.state = states.GAME_OVER
@@ -357,17 +350,15 @@ class Game:
             self.audio.play("game_over")
             return
 
-    def _show_damage_quip(self, amount):
+    def _show_damage_quip(self, amount, reason=""):
         import random
         if amount >= settings.DAMAGE_LARGE_LOW:
-            self.hud_quip = random.choice(BIG_HIT_QUIPS)
+            reaction = random.choice(BIG_HIT_QUIPS)
         else:
-            self.hud_quip = random.choice(BUMP_QUIPS)
+            reaction = random.choice(BUMP_QUIPS)
+        self.hud_quip = f"{reason} {reaction}".strip()
         self.hud_quip_timer = 1.6
 
-    # ------------------------------------------------------------------
-    # DRAW
-    # ------------------------------------------------------------------
     def draw(self):
         if self.state == states.MENU:
             self.menu_rects = ui.draw_main_menu(self.screen, self.fonts, self.menu_selected_index)

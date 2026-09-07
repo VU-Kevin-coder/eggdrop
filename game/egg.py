@@ -1,10 +1,3 @@
-"""
-game/egg.py
-----------------
-The egg. This is the star of the game - the mechanic, the challenge,
-and the joke, all in one small oval object.
-"""
-
 import random
 import math
 
@@ -30,11 +23,8 @@ class Egg:
         self._surface_cache_key = None
         self._surface_cache = None
 
-        # bookkeeping used by Level to avoid re-damaging every single
-        # frame while overlapping the same hazard
         self.hazard_cooldowns = {}
 
-    # ------------------------------------------------------------------
     @property
     def rect(self):
         w, h = self.size
@@ -56,7 +46,6 @@ class Egg:
     def tier(self):
         return self._tier_for(self.condition)
 
-    # ------------------------------------------------------------------
     def pick_up(self, audio):
         self.carried = True
         audio.play("pickup")
@@ -86,7 +75,6 @@ class Egg:
             self.carried = False
             self.damage(settings.DAMAGE_KNOCKBACK_DROP, audio)
 
-    # ------------------------------------------------------------------
     def damage(self, amount, audio):
         if self.broken or amount <= 0:
             return
@@ -122,7 +110,6 @@ class Egg:
         self.condition = min(settings.EGG_START_CONDITION, self.condition + amount)
         return self.condition - before
 
-    # ------------------------------------------------------------------
     def update(self, dt):
         self._wobble_t += dt
         if self.shake_timer > 0:
@@ -135,17 +122,14 @@ class Egg:
         ox, oy = settings.EGG_CARRY_OFFSET
         self.pos = pygame.Vector2(player_pos.x + ox, player_pos.y + oy)
 
-    # ------------------------------------------------------------------
     def _current_shake_offset(self):
         offset = pygame.Vector2(0, 0)
 
-        # short punchy shake right after taking damage
         if self.shake_timer > 0:
             mag = self.shake_strength * (self.shake_timer / 0.35)
             offset.x += random.uniform(-mag, mag)
             offset.y += random.uniform(-mag, mag)
 
-        # continuous wobble that grows as the egg gets more fragile
         wobble_amp = {
             "normal": 0.0,
             "small_crack": 0.6,
@@ -161,7 +145,7 @@ class Egg:
 
     def draw(self, surface):
         w, h = self.size
-        crack_seed = int(self._wobble_t * 3)  # cracks re-jitter a few times/sec, not every frame
+        crack_seed = int(self._wobble_t * 3)
         egg_surf = assets.draw_egg_surface(self.condition, self.size, wobble_seed=crack_seed)
 
         offset = self._current_shake_offset()

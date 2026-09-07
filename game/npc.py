@@ -1,11 +1,3 @@
-"""
-game/npc.py
-----------------
-Small, static (or gently wandering) characters that comment on the
-player's very serious egg mission. Dialogue is short by design - the
-gameplay is the story, not the NPCs.
-"""
-
 import math
 import pygame
 

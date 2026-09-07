@@ -1,8 +1,5 @@
 import os
 
-# ---------------------------------------------------------------------------
-# PATHS
-# ---------------------------------------------------------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
 
@@ -16,17 +13,11 @@ PLAYER_IMAGE_PATH = os.path.join(CHARACTERS_DIR, "player.png")
 NPC_IMAGE_PATH = os.path.join(CHARACTERS_DIR, "npc.png")
 EGG_IMAGE_PATH = os.path.join(OBJECTS_DIR, "egg.png")
 
-# ---------------------------------------------------------------------------
-# WINDOW / TIME
-# ---------------------------------------------------------------------------
 SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 FPS = 60
 GAME_TITLE = "DON'T DROP THE EGG"
 
-# ---------------------------------------------------------------------------
-# COLORS
-# ---------------------------------------------------------------------------
 WHITE = (245, 245, 240)
 CREAM = (250, 240, 210)
 BLACK = (20, 20, 20)
@@ -50,23 +41,16 @@ CONDITION_OK_COLOR = (225, 200, 70)
 CONDITION_BAD_COLOR = (230, 140, 60)
 CONDITION_CRITICAL_COLOR = (205, 60, 55)
 
-# ---------------------------------------------------------------------------
-# PLAYER
-# ---------------------------------------------------------------------------
 PLAYER_SIZE = (48, 64)
-PLAYER_SPEED = 230.0          # pixels / second
-PLAYER_COLLIDER_INSET = (12, 8)  # shrink the collision rect vs sprite size
+PLAYER_SPEED = 230.0
+PLAYER_COLLIDER_INSET = (12, 8)
 
-# ---------------------------------------------------------------------------
-# EGG
-# ---------------------------------------------------------------------------
 EGG_SIZE = (34, 42)
 EGG_START_CONDITION = 100
 EGG_PICKUP_RADIUS = 55
-EGG_CARRY_OFFSET = (0, -18)   # relative to player center, "held in front" position
+EGG_CARRY_OFFSET = (0, -18)
 DELIVERY_RADIUS = 78
 
-# Damage tiers (see usage in game/egg.py and level obstacles)
 DAMAGE_SMALL_BUMP = 5
 DAMAGE_MEDIUM_LOW = 10
 DAMAGE_DISTRACTOR_BUMP = 4
@@ -78,22 +62,16 @@ DAMAGE_KNOCKBACK_DROP = 18
 EGG_CHICK_HEAL = 8
 CHICK_HEAL_COOLDOWN = 1.0
 
-BUMP_COOLDOWN = 0.8  # seconds between repeated solid-obstacle bump damage
+BUMP_COOLDOWN = 0.8
+DAMAGE_GRACE_PERIOD = 0.35
 
-# Condition tier thresholds (inclusive upper bound of each band)
 TIER_NORMAL = 100
 TIER_SMALL_CRACK = 75
 TIER_CRACKED = 50
 TIER_CRITICAL = 25
 TIER_BROKEN = 0
 
-# ---------------------------------------------------------------------------
-# CONTROLS (reference only - actual keys read in game/game.py)
-# ---------------------------------------------------------------------------
-CONTROLS_TEXT = "WASD/Arrows: Move   E: Pick Up / Gently place   SPACE: Drop   ESC: Pause"
+CONTROLS_TEXT = "WASD/Arrows: Move   E: Pick Up / Deliver   SPACE: Drop (damage)   ESC: Pause"
 
-# ---------------------------------------------------------------------------
-# MISC
-# ---------------------------------------------------------------------------
-FONT_NAME = None  # default pygame font
-LEVEL_COMPLETE_DELAY = 2.2   # seconds shown before advancing automatically
+FONT_NAME = None
+LEVEL_COMPLETE_DELAY = 2.2

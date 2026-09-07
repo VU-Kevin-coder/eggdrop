@@ -1,12 +1,3 @@
-"""
-game/level.py
---------------
-Levels are described as plain data in LEVEL_DATA and turned into real
-Obstacle/NPC objects by the Level class. This keeps all 5 levels easy
-to read, tune and compare at a glance, without five near-duplicate
-files.
-"""
-
 import pygame
 
 import settings
@@ -14,12 +5,10 @@ from game.obstacle import Obstacle
 from game.npc import NPC
 from game import assets
 
-# Play area (leaves room at the top of the screen for the HUD)
 PLAY_BOUNDS = pygame.Rect(20, 104, settings.SCREEN_WIDTH - 40, settings.SCREEN_HEIGHT - 124)
 
 
 LEVEL_DATA = [
-    # ------------------------------------------------------------ LEVEL 1
     {
         "name": "THE HOUSE",
         "background": ("house.png", "house"),
@@ -27,6 +16,7 @@ LEVEL_DATA = [
         "player_start": (160, 630),
         "egg_start": (160, 520),
         "start_with_egg_carried": False,
+        "bump_damage": 3,
         "exit_rect": pygame.Rect(1190, 300, 60, 170),
         "obstacles": [
             {"rect": (200, 520, 760, 42), "kind": "solid", "color": settings.BROWN},
@@ -38,7 +28,6 @@ LEVEL_DATA = [
         ],
         "npcs": [],
     },
-    # ------------------------------------------------------------ LEVEL 2
     {
         "name": "THE MARKET",
         "background": ("market.png", "market"),
@@ -46,6 +35,7 @@ LEVEL_DATA = [
         "player_start": (90, 660),
         "egg_start": (90, 560),
         "start_with_egg_carried": False,
+        "bump_damage": 5,
         "distractors": [
             {"pos": (520, 260), "line": "Look at me. Ignore the egg."},
         ],
@@ -60,7 +50,6 @@ LEVEL_DATA = [
             {"pos": (960, 340), "line": "Is that REALLY an egg?"},
         ],
     },
-    # ------------------------------------------------------------ LEVEL 3
     {
         "name": "THE ROAD",
         "background": ("road.png", "road"),
@@ -68,6 +57,7 @@ LEVEL_DATA = [
         "player_start": (630, 660),
         "egg_start": (630, 570),
         "start_with_egg_carried": False,
+        "bump_damage": 6,
         "distractors": [
             {"pos": (380, 560), "line": "The shortcut is definitely safe."},
         ],
@@ -75,18 +65,17 @@ LEVEL_DATA = [
         "obstacles": [
             {
                 "rect": (100, 260, 100, 55), "kind": "hazard", "color": settings.RED,
-                "damage": settings.DAMAGE_LARGE_LOW, "knockback": True,
-                "move_axis": "x", "move_range": 480, "move_speed": 260,
+                "damage": 18, "knockback": True,
+                "move_axis": "x", "move_range": 480, "move_speed": 220,
             },
             {
                 "rect": (1080, 430, 100, 55), "kind": "hazard", "color": (60, 90, 190),
-                "damage": settings.DAMAGE_LARGE_LOW, "knockback": True,
-                "move_axis": "x", "move_range": 480, "move_speed": 200,
+                "damage": 18, "knockback": True,
+                "move_axis": "x", "move_range": 480, "move_speed": 180,
             },
         ],
         "npcs": [],
     },
-    # ------------------------------------------------------------ LEVEL 4
     {
         "name": "CONSTRUCTION SITE",
         "background": ("construction.png", "construction"),
@@ -94,6 +83,7 @@ LEVEL_DATA = [
         "player_start": (110, 650),
         "egg_start": (110, 540),
         "start_with_egg_carried": False,
+        "bump_damage": 7,
         "distractors": [
             {"pos": (820, 220), "line": "Wait for it..."},
         ],
@@ -104,28 +94,25 @@ LEVEL_DATA = [
             {"rect": (760, 260, 40, 444), "kind": "solid", "color": settings.YELLOW},
             {
                 "rect": (600, 130, 60, 60), "kind": "hazard", "color": settings.GRAY,
-                "damage": settings.DAMAGE_LARGE_HIGH, "knockback": True,
-                "move_axis": "y", "move_range": 220, "move_speed": 300,
+                "damage": 24, "knockback": True,
+                "move_axis": "y", "move_range": 220, "move_speed": 220,
             },
             {
                 "rect": (960, 300, 60, 60), "kind": "hazard", "color": settings.GRAY,
-                "damage": settings.DAMAGE_LARGE_HIGH, "knockback": True,
-                "move_axis": "y", "move_range": 200, "move_speed": 240,
+                "damage": 24, "knockback": True,
+                "move_axis": "y", "move_range": 200, "move_speed": 180,
             },
             {
                 "rect": (150, 420, 130, 70), "kind": "hazard", "color": (140, 120, 60),
-                "damage": settings.DAMAGE_MEDIUM_LOW, "knockback": False,
+                "damage": 8, "knockback": False,
             },
             {
-                # an open pit - a genuine "major fall" hazard, clearly
-                # darker than everything else so it reads as dangerous
                 "rect": (940, 480, 90, 90), "kind": "hazard", "color": settings.BLACK,
-                "damage": settings.DAMAGE_MAJOR_FALL, "knockback": False,
+                "damage": 35, "knockback": False,
             },
         ],
         "npcs": [],
     },
-    # ------------------------------------------------------------ LEVEL 5
     {
         "name": "GRANDMA'S HOUSE",
         "background": ("grandma_house.png", "grandma"),
@@ -133,6 +120,7 @@ LEVEL_DATA = [
         "player_start": (110, 650),
         "egg_start": (110, 540),
         "start_with_egg_carried": False,
+        "bump_damage": 8,
         "distractors": [
             {"pos": (520, 380), "line": "One little bump won't matter.", "wander_range": 100},
         ],
@@ -143,8 +131,13 @@ LEVEL_DATA = [
             {"rect": (20, 180, 640, 42), "kind": "solid", "color": settings.DARK_GREEN},
             {
                 "rect": (500, 590, 60, 40), "kind": "hazard", "color": settings.GRAY,
-                "damage": settings.DAMAGE_MEDIUM_LOW, "knockback": False,
+                "damage": 18, "knockback": False,
                 "move_axis": "x", "move_range": 260, "move_speed": 90,
+            },
+            {
+                "rect": (850, 180, 55, 55), "kind": "hazard", "color": settings.GRAY,
+                "damage": 20, "knockback": False,
+                "move_axis": "y", "move_range": 230, "move_speed": 150,
             },
         ],
         "npcs": [
@@ -178,10 +171,11 @@ class Level:
 
         self.bounds = PLAY_BOUNDS
         self._bump_cooldown = 0.0
+        self._damage_grace_timer = 0.0
+        self.last_damage_reason = ""
 
         self.reset_hazards()
 
-    # ------------------------------------------------------------------
     def reset_hazards(self):
         """(Re)builds obstacles/npcs so patrol timers/positions are fresh."""
         self.obstacles = []
@@ -224,6 +218,8 @@ class Level:
             ))
 
         self._bump_cooldown = 0.0
+        self._damage_grace_timer = 0.0
+        self.last_damage_reason = ""
         self._hazard_cooldowns = {}
         self._distractor_cooldowns = {}
         self._chick_cooldowns = {}
@@ -236,7 +232,6 @@ class Level:
     def hazard_obstacles(self):
         return [o for o in self.obstacles if o.kind == "hazard"]
 
-    # ------------------------------------------------------------------
     def update(self, dt, player, egg, audio):
         for obstacle in self.obstacles:
             obstacle.update(dt)
@@ -245,17 +240,19 @@ class Level:
 
         if self._bump_cooldown > 0:
             self._bump_cooldown -= dt
+        if self._damage_grace_timer > 0:
+            self._damage_grace_timer -= dt
 
-        # --- solid bump damage (only while carrying, gentle, cooled down) ---
         if player.carrying is not None and self._bump_cooldown <= 0:
             player_rect = player.rect
             for solid_rect in self.solid_rects:
-                if player_rect.colliderect(solid_rect):
-                    egg.damage(settings.DAMAGE_SMALL_BUMP, audio)
+                if player_rect.colliderect(solid_rect) and self._damage_grace_timer <= 0:
+                    egg.damage(self.data.get("bump_damage", settings.DAMAGE_SMALL_BUMP), audio)
                     self._bump_cooldown = settings.BUMP_COOLDOWN
+                    self._damage_grace_timer = settings.DAMAGE_GRACE_PERIOD
+                    self.last_damage_reason = "You bumped a barrier."
                     break
 
-        # --- hazards: can hurt the egg whether it's carried or sitting ---
         egg_rect = egg.rect
         for i, hazard in enumerate(self.hazard_obstacles):
             cooldown_key = id(hazard)
@@ -267,21 +264,17 @@ class Level:
             touched = hazard.rect.colliderect(egg_rect) or (
                 player.carrying is not None and hazard.rect.colliderect(player.rect)
             )
-            if touched:
+            if touched and self._damage_grace_timer <= 0:
                 egg.damage(hazard.damage, audio)
                 self._hazard_cooldowns[cooldown_key] = 1.0
+                self._damage_grace_timer = settings.DAMAGE_GRACE_PERIOD
+                self.last_damage_reason = "The egg hit a hazard."
                 if hazard.knockback and egg.carried:
-                    # the impact already accounted for the damage above -
-                    # this just knocks it out of the player's hands so
-                    # they have to go recover it, without double-charging
                     egg.carried = False
                     player.carrying = None
                     egg.pos = pygame.Vector2(player.pos.x, player.pos.y + 40)
 
-        # --- distractors: hecklers add small stress when touched ---
         if player.carrying is not None:
-            # Friendly chicks restore a little condition when the player
-            # carrying the egg passes through them.
             for npc in self.npcs:
                 if npc.is_distractor or not npc.rect.colliderect(player.rect):
                     continue
@@ -298,19 +291,19 @@ class Level:
                     continue
                 cooldown_key = id(npc)
                 cooldown = self._distractor_cooldowns.get(cooldown_key, 0.0)
-                if cooldown <= 0:
+                if cooldown <= 0 and self._damage_grace_timer <= 0:
                     egg.damage(settings.DAMAGE_DISTRACTOR_BUMP, audio)
                     audio.play("distractor", volume=0.7)
                     self._distractor_cooldowns[cooldown_key] = 1.2
+                    self._damage_grace_timer = settings.DAMAGE_GRACE_PERIOD
+                    self.last_damage_reason = "A heckler distracted you."
                 else:
                     self._distractor_cooldowns[cooldown_key] = cooldown - dt
 
-        # --- exit check: entering arms a deliberate placement, never completes ---
         if player.rect.colliderect(self.exit_rect) and egg.carried and not egg.broken:
             return "ready_to_place"
         return None
 
-    # ------------------------------------------------------------------
     def draw_background(self, surface):
         surface.blit(self.background, (0, 0))
 
